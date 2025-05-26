@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: zarbanah-server
+    env: python
+    buildCommand: ""
+    startCommand: python app.py
+    envVars:
+      - key: OPENAI_API_KEY
+        value: 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
