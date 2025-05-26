@@ -4,7 +4,12 @@ import os
 
 app = Flask(__name__)
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+# قراءة مفتاح OpenAI من متغير البيئة
+openai.api_key = os.environ.get("OPENAI_API_KEY")
+
+@app.route("/")
+def home():
+    return "Zarbanah AI Server is running."
 
 @app.route("/ask", methods=["POST"])
 def ask():
@@ -13,12 +18,11 @@ def ask():
         question = data.get("question", "")
 
         if not question:
-            return jsonify({"error": "No question provided"}), 400
+            return jsonify({"answer": "اكتب سؤال يا نجم!"}), 400
 
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "أنت مساعد ذكي اسمه زعربانة."},
                 {"role": "user", "content": question}
             ],
             temperature=0.7
@@ -26,11 +30,10 @@ def ask():
 
         answer = response['choices'][0]['message']['content']
         return jsonify({"answer": answer})
-    
-    except Exception as e:
-        print("Error:", e)
-        return jsonify({"error": str(e)}), 500
 
-@app.route("/", methods=["GET"])
-def home():
-    return "Zarbanah Server is running!"
+    except Exception as e:
+        return jsonify({"answer": f"حصل خطأ: {str(e)}"}), 500
+
+# تشغيل السيرفر بالطريقة الصحيحة لبيئة Render
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
